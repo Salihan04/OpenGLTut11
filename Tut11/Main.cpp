@@ -22,6 +22,15 @@ using namespace glm;
 //Properties
 GLuint screenWidth = 700, screenHeight = 500;
 
+struct Character {
+	GLuint textureID;	//ID handle of the glyph texture
+	ivec2 size;			//Size of glyph
+	ivec2 bearing;		//Offset from baseline to left/top of glyph
+	GLuint advance;		//Offset to advance to next glyph
+};
+
+map<GLchar, Character> characters;
+
 int main(int argc, char **argv)
 {
 	//initialise GLFW
@@ -62,6 +71,20 @@ int main(int argc, char **argv)
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//FreeType
+	FT_Library ft;
+	//All functions return a value different than 0 whenever an error occurred
+	if (FT_Init_FreeType(&ft))
+		cout << "ERROR::FREETYPE: Could not init FreeType Library" << endl;
+
+	//Load font as face
+	FT_Face face;
+	if (FT_New_Face(ft, "fonts/arial.ttf", 0, &face))
+		cout << "ERROR::FREETYPE: Failed to load font" << endl;
+
+	//Set size to load glyphs as
+	FT_Set_Pixel_Sizes(face, 0, 48);
 
 	while (!glfwWindowShouldClose(window))
 	{
